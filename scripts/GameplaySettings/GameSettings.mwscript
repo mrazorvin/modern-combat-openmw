@@ -1,0 +1,70 @@
+Begin GameSettings
+
+  float debuff_timer
+  float debuff_id
+
+  if debuff_timer <= 0 
+    set debuff_timer to 2
+
+    if debuff_id <= 0 
+      set debuff_id to 5
+    else
+      set debuff_id to debuff_id - 1
+    endif
+  else
+    set debuff_timer to debuff_timer - GetSecondsPassed
+  endif
+	
+  if Player->GetSpellEffects "GSAlwaysHit" == 0
+	  Player->AddSpell "GSAlwaysHit"
+  endif
+
+  if debuff_id == 5
+    if Player->GetSpellEffects "GSElementsBlessing" == 0
+      Player->AddSpell "GSElementsBlessing"
+    endif 
+  elseif Player->GetSpellEffects "GSElementsBlessing" == 1
+    Player->RemoveSpell "GSElementsBlessing"
+  endif
+
+  if debuff_id == 4 
+    if Player->GetSpellEffects "GSPoisonCurse" == 0
+      Player->AddSpell "GSPoisonCurse"
+    endif 
+  elseif Player->GetSpellEffects "GSPoisonCurse" == 1
+    Player->RemoveSpell "GSPoisonCurse"
+  endif
+
+  if debuff_id == 3
+    if Player->GetSpellEffects "GSMagickaCurse" == 0
+      Player->AddSpell "GSMagickaCurse"
+    endif 
+  elseif Player->GetSpellEffects "GSMagickaCurse" == 1
+    Player->RemoveSpell "GSMagickaCurse"
+  endif
+
+  if debuff_id == 2
+    if Player->GetSpellEffects "GSShockCurse" == 0
+      Player->AddSpell "GSShockCurse"
+    endif 
+  elseif Player->GetSpellEffects "GSShockCurse" == 1
+    Player->RemoveSpell "GSShockCurse"
+  endif
+
+  if debuff_id == 1
+    if Player->GetSpellEffects "GSFrostCurse" == 0
+      Player->AddSpell "GSFrostCurse"
+    endif 
+  elseif Player->GetSpellEffects "GSFrostCurse" == 1
+    Player->RemoveSpell "GSFrostCurse"
+  endif
+
+  if debuff_id == 0
+    if Player->GetSpellEffects "GSFireCurse" == 0
+      Player->AddSpell "GSFireCurse"
+    endif 
+  elseif Player->GetSpellEffects "GSFireCurse" == 1
+    Player->RemoveSpell "GSFireCurse"
+  endif
+
+End GameSettings
