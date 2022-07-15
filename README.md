@@ -17,6 +17,7 @@ Modern combat and gameplay mechanics for OpenMW
 - [tes3cmd auto-patch](https://github.com/SilentNightx/BBCAutoPatcher-2.0)
 - [tes3cmd lightfix](https://github.com/glassmancody/waza_lightfixes)
 - [tes3merge](https://www.nexusmods.com/morrowind/mods/46870)
+- [Delta plugin](https://gitlab.com/bmwinger/delta-plugin)
 
 ## Other LUA mods
 
