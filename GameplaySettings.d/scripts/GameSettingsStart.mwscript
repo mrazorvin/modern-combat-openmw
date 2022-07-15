@@ -1,0 +1,6 @@
+Begin GameSettingsStart
+	
+	Player->StartScript GameSettings
+	StopScript GameSettingsStart	
+
+End GameSettingsStart

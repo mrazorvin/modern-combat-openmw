@@ -1,0 +1,230 @@
+---
+__esp_version__: 1.3
+__plugin_type__: 0
+transpiler_version: 0.15.1
+author: ""
+desc: ""
+masters:
+  - name: Morrowind.esm
+    size: 79837557
+records:
+  "GameSetting::fMinWalkSpeed":
+    type: GameSetting
+    float: -0.01
+  "GameSetting::fMaxWalkSpeed":
+    type: GameSetting
+    float: 300.0
+  "GameSetting::fEncumberedMoveEffect":
+    type: GameSetting
+    float: 0.0
+  "GameSetting::fBaseRunMultiplier":
+    type: GameSetting
+    float: 0.0
+  "GameSetting::fAthleticsRunBonus":
+    type: GameSetting
+    float: 2.0
+  "GameSetting::fJumpAcrobaticsBase":
+    type: GameSetting
+    float: 110.0
+  "GameSetting::fJumpAcroMultiplier":
+    type: GameSetting
+    float: 2.0
+  "GameSetting::fSwimWalkAthleticsMult":
+    type: GameSetting
+    float: 0.5
+  "GameSetting::fSwimRunAthleticsMult":
+    type: GameSetting
+    float: 0.8
+  "GameSetting::fFatigueBase":
+    type: GameSetting
+    float: 1.0
+  "GameSetting::fFatigueMult":
+    type: GameSetting
+    float: 0.0
+  "GameSetting::fFatigueReturnBase":
+    type: GameSetting
+    float: 1.1
+  "GameSetting::fFatigueReturnMult":
+    type: GameSetting
+    float: 0.7
+  "GameSetting::fEndFatigueMult":
+    type: GameSetting
+    float: 1.0
+  "GameSetting::fFatigueAttackBase":
+    type: GameSetting
+    float: 25.0
+  "GameSetting::fWeaponFatigueMult":
+    type: GameSetting
+    float: 1.0
+  "GameSetting::fFatigueBlockBase":
+    type: GameSetting
+    float: 40.0
+  "GameSetting::fFatigueRunBase":
+    type: GameSetting
+    float: 1.9
+  "GameSetting::fFatigueRunMult":
+    type: GameSetting
+    float: 1.0
+  "GameSetting::fFatigueJumpBase":
+    type: GameSetting
+    float: 10.0
+  "GameSetting::fFatigueSwimWalkBase":
+    type: GameSetting
+    float: 0.0
+  "GameSetting::fFatigueSwimRunBase":
+    type: GameSetting
+    float: 0.0
+  "GameSetting::fFatigueSneakBase":
+    type: GameSetting
+    float: 0.0
+  "GameSetting::fFatigueSneakMult":
+    type: GameSetting
+    float: 0.0
+  "GameSetting::fEncumbranceStrMult":
+    type: GameSetting
+    float: 2.0
+  "GameSetting::fAIMagicSpellMult":
+    type: GameSetting
+    float: 4.0
+  "GameSetting::fAIRangeMagicSpellMult":
+    type: GameSetting
+    float: 7.0
+  "Script::GameSettingsStart":
+    type: Script
+    script: !include_str "scripts/GameSettingsStart.mwscript"
+    preserved:
+      shorts: 0
+      longs: 0
+      floats: 0
+      data_size: 0
+      var_size: 0
+      variables: []
+      compiled: ""
+  "Script::GameSettings":
+    type: Script
+    script: !include_str "scripts/GameSettings.mwscript"
+    preserved:
+      shorts: 0
+      longs: 0
+      floats: 0
+      data_size: 0
+      var_size: 0
+      variables: []
+      compiled: ""
+  "Spell::GSAlwaysHit":
+    type: Spell
+    name: Nerevarine Fate
+    spell_type: Ability
+    cost: 0
+    effects:
+      - effect_type: Feather
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 200
+        max_magnitude: 200
+      - effect_type: FortifyAttack
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 150
+        max_magnitude: 150
+  "Spell::GSFireCurse":
+    type: Spell
+    name: Fire Curse
+    spell_type: Curse
+    cost: 0
+    effects:
+      - effect_type: WeaknessToFire
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 100
+        max_magnitude: 100
+  "Spell::GSFrostCurse":
+    type: Spell
+    name: Frost Curse
+    spell_type: Curse
+    cost: 0
+    effects:
+      - effect_type: WeaknessToFrost
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 100
+        max_magnitude: 100
+  "Spell::GSShockCurse":
+    type: Spell
+    name: Shock Curse
+    spell_type: Curse
+    cost: 0
+    effects:
+      - effect_type: WeaknessToShock
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 100
+        max_magnitude: 100
+  "Spell::GSMagickaCurse":
+    type: Spell
+    name: Magicka Curse
+    spell_type: Curse
+    cost: 0
+    effects:
+      - effect_type: WeaknessToPoison
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 100
+        max_magnitude: 100
+  "Spell::GSPoisonCurse":
+    type: Spell
+    name: Poison Curse
+    spell_type: Curse
+    cost: 0
+    effects:
+      - effect_type: WeaknessToMagicka
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 100
+        max_magnitude: 100
+  "Spell::GSElementsBlessing":
+    type: Spell
+    name: Nerevarine Blessing
+    spell_type: Curse
+    cost: 0
+    effects:
+      - effect_type: ResistPoison
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 25
+        max_magnitude: 25
+      - effect_type: ResistShock
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 25
+        max_magnitude: 25
+      - effect_type: ResistMagicka
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 25
+        max_magnitude: 25
+      - effect_type: ResistFrost
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 25
+        max_magnitude: 25
+      - effect_type: ResistFire
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 25
+        max_magnitude: 25
+  "Startup::GameSettingsStart":
+    type: Startup
+    data: ""
