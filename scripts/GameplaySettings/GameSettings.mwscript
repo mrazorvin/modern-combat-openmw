@@ -8,6 +8,11 @@ Begin GameSettings
 
     if debuff_id <= 0 
       set debuff_id to 5
+
+      if Player->GetSpellEffects "GSAlwaysHit" == 1
+        Player->RemoveSpell "GSAlwaysHit"
+      endif
+      Player->AddSpell "GSAlwaysHit"
     else
       set debuff_id to debuff_id - 1
     endif
@@ -15,10 +20,6 @@ Begin GameSettings
     set debuff_timer to debuff_timer - GetSecondsPassed
   endif
 	
-  if Player->GetSpellEffects "GSAlwaysHit" == 0
-	  Player->AddSpell "GSAlwaysHit"
-  endif
-
   if debuff_id == 5
     if Player->GetSpellEffects "GSElementsBlessing" == 0
       Player->AddSpell "GSElementsBlessing"
