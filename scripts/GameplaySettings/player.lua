@@ -3,9 +3,21 @@ local types = require("openmw.types")
 local self = require('openmw.self')
 local ui = require('openmw.ui')
 local storage = require('openmw.storage')
+local I = require('openmw.interfaces')
 
 local Player = types.Player
-local WepType = types.Weapon.TYPE;
+local WepType = types.Weapon.TYPE
+
+local MOD_NAME = "ModernCombat"
+local MOD_SETTINGS = MOD_NAME .. "Settings__"
+
+I.Settings.registerPage {
+    key = MOD_NAME,
+    l10n = MOD_NAME,
+    name = "Modern combat"
+}
+
+local settings = storage.globalSection(MOD_SETTINGS)
 
 local attack_commited_speed_adjusted = 0
 local dodge_speed_adjusted = 0
@@ -30,6 +42,9 @@ local recovery_effectivity = 100
 local MAX_TIME_IN_COMBAT = 5
 
 local function onUpdate()
+    local is_mod_disabled = settings:get("Disabled")
+    local is_mod_enabled = not is_mod_disabled
+
     local fatigue = Player.stats.dynamic.fatigue(self)
     local health = Player.stats.dynamic.health(self)
     local level = Player.stats.level(self)
@@ -82,7 +97,7 @@ local function onUpdate()
     -- =================
     -- * Stops fatigue regeneration while running or jumping 
     -- * Increase fatigue drain durin backward movement 
-    if (is_attack or is_move or is_jump or in_air) and (in_combat and can_move) then
+    if is_mod_enabled and (is_attack or is_move or is_jump or in_air) and (in_combat and can_move) then
         local backward_fatigue_drain = 0
         if is_move_backward then
             backward_fatigue_drain = 0.18
@@ -102,7 +117,7 @@ local function onUpdate()
     -- DODGE
     -- =====
     local can_dodge = dodge_speed_adjusted == 0
-    if (is_move_backward or is_move_side) and is_jump and can_move and can_dodge then
+    if (is_move_backward or is_move_side) and (is_mod_enabled and is_jump and can_move and can_dodge) then
         dodge_speed_adjusted = 0
 
         if is_move_side then
@@ -146,7 +161,7 @@ local function onUpdate()
     -- ==========
     -- * Increase run speed for early levels
     -- * Increase walk speed for early levels
-    if is_move then
+    if is_move and is_mod_enabled then
         if speed_adjusted == 0 and base_speed < 50 then
             speed_adjusted = 50 - base_speed
             speed.base = speed.base + speed_adjusted
@@ -156,7 +171,7 @@ local function onUpdate()
         speed_adjusted = 0
     end
 
-    if is_run then
+    if is_run and is_mod_enabled then
         if athletics_adjusted == 0 and base_athletics < 70 then
             athletics_adjusted = 70 - base_athletics
             athletics.base = athletics.base + athletics_adjusted
@@ -170,7 +185,7 @@ local function onUpdate()
     -- ===============
     -- * Lock player in backward direction on attack
     -- * Increse player forward attack direction
-    if is_attack then
+    if is_attack and is_mod_enabled then
         last_attack_commited_time = real_time
     end
 
@@ -192,10 +207,16 @@ local function onUpdate()
     -- RETROACTIVE HEALTH
     -- ==================
     -- * Adjust health dynamically based on endurance
-    local health_mod = math.floor(level.current * (base_endurance / 7.5))
-    if health_mod ~= health_adjusted then
-        health.base = base_health + health_mod
-        health_adjusted = health_mod
+    local health_mod = 45 + math.floor(level.current * (base_endurance / 7.5))
+    if is_mod_enabled and health.base < health_mod then
+        local next_health_adjusted = health_mod - (health.base - health_adjusted)
+        if next_health_adjusted ~= health_adjusted then
+            health.base = health.base - health_adjusted + next_health_adjusted
+            health_adjusted = next_health_adjusted
+        end
+    elseif is_mod_disabled and health_adjusted ~= 0 then
+        health.base = health.base - health_adjusted
+        health_adjusted = 0
     end
 
     -- REDUCE STRENGHT ON LOW SKILL
@@ -203,7 +224,8 @@ local function onUpdate()
     -- * Reduce strength when using unskilled weapon
     local weapon = Player.equipment(self, types.Actor.EQUIPMENT_SLOT.CarriedRight)
     local melee_weapon = false
-    if Player.stance(self) == types.Actor.STANCE.Weapon and weapon and weapon.type == types.Weapon then
+    local is_weapon = weapon and weapon.type == types.Weapon
+    if is_mod_enabled and is_weapon and Player.stance(self) == types.Actor.STANCE.Weapon then
         local wep_type = types.Weapon.record(weapon).type;
         local skill = nil;
 
@@ -247,13 +269,13 @@ local function onUpdate()
         recovery_effectivity = math.max(0, recovery_effectivity - seconds_passed_since_update * 2)
     end
 
-    if remain_health <= 0.45 and not in_combat then
+    if is_mod_enabled and remain_health <= 0.45 and not in_combat then
         health.current = health.current + health.base * 0.05 * seconds_passed_since_update
     end
 
     local can_recovery = health_from_previous_frame ~= 0 and melee_weapon and (remain_health <= 0.5)
     local health_diff = health_from_previous_frame - health.current
-    if can_recovery and health_diff > 0 then
+    if is_mod_enabled and can_recovery and health_diff > 0 then
         local recovery_amount = math.min(math.max(1 - (remain_health / 0.5), 0.2), 0.8) *
                                     math.max((recovery_effectivity / 100), 0.5)
 
@@ -272,7 +294,7 @@ local function onUpdate()
     -- 
     -- !!!! Keep this part as low as possible
     -- 
-    if fatigue.current <= 0 and last_knockdown_time == 0 then
+    if is_mod_enabled and fatigue.current <= 0 and last_knockdown_time == 0 then
         fatigue.current = -50
         last_knockdown_time = real_time
     elseif last_knockdown_time ~= 0 and real_time - last_knockdown_time > 3 then
