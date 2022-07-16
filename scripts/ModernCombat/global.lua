@@ -28,6 +28,12 @@ local function onActorActive(actor)
 end
 
 return {
+    eventHandlers = {
+        ActorInactive = function(data)
+            local actor = unpack(data)
+            actor:removeScript("scripts/ModernCombat/npc.lua")
+        end
+    },
     engineHandlers = {
         onActorActive = onActorActive
     }
