@@ -89,9 +89,9 @@ records:
   "GameSetting::fAIRangeMagicSpellMult":
     type: GameSetting
     float: 7.0
-  "Script::GameSettingsStart":
+  "Script::ModernCombatStart":
     type: Script
-    script: !include_str "scripts/GameSettingsStart.mwscript"
+    script: !include_str "scripts/ModernCombatStart.mwscript"
     preserved:
       shorts: 0
       longs: 0
@@ -100,9 +100,9 @@ records:
       var_size: 0
       variables: []
       compiled: ""
-  "Script::GameSettings":
+  "Script::ModernCombat":
     type: Script
-    script: !include_str "scripts/GameSettings.mwscript"
+    script: !include_str "scripts/ModernCombat.mwscript"
     preserved:
       shorts: 0
       longs: 0
@@ -111,7 +111,7 @@ records:
       var_size: 0
       variables: []
       compiled: ""
-  "Spell::GSAlwaysHit":
+  "Spell::MCPlayer":
     type: Spell
     name: Nerevarine Fate
     spell_type: Ability
@@ -129,7 +129,7 @@ records:
         duration: 0
         min_magnitude: 150
         max_magnitude: 150
-  "Spell::GSFireCurse":
+  "Spell::MCFireCurse":
     type: Spell
     name: Fire Curse
     spell_type: Curse
@@ -141,7 +141,7 @@ records:
         duration: 0
         min_magnitude: 100
         max_magnitude: 100
-  "Spell::GSFrostCurse":
+  "Spell::MCFrostCurse":
     type: Spell
     name: Frost Curse
     spell_type: Curse
@@ -153,7 +153,7 @@ records:
         duration: 0
         min_magnitude: 100
         max_magnitude: 100
-  "Spell::GSShockCurse":
+  "Spell::MCShockCurse":
     type: Spell
     name: Shock Curse
     spell_type: Curse
@@ -165,7 +165,7 @@ records:
         duration: 0
         min_magnitude: 100
         max_magnitude: 100
-  "Spell::GSMagickaCurse":
+  "Spell::MCMagickaCurse":
     type: Spell
     name: Magicka Curse
     spell_type: Curse
@@ -177,7 +177,7 @@ records:
         duration: 0
         min_magnitude: 100
         max_magnitude: 100
-  "Spell::GSPoisonCurse":
+  "Spell::MCPoisonCurse":
     type: Spell
     name: Poison Curse
     spell_type: Curse
@@ -189,7 +189,7 @@ records:
         duration: 0
         min_magnitude: 100
         max_magnitude: 100
-  "Spell::GSElementsBlessing":
+  "Spell::MCBlessing":
     type: Spell
     name: Nerevarine Blessing
     spell_type: Curse
@@ -225,6 +225,6 @@ records:
         duration: 0
         min_magnitude: 25
         max_magnitude: 25
-  "Startup::GameSettingsStart":
+  "Startup::ModernCombatStart":
     type: Startup
     data: ""

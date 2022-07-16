@@ -1,0 +1,71 @@
+Begin ModernCombat
+
+  float debuff_timer
+  float debuff_id
+
+  if debuff_timer <= 0 
+    set debuff_timer to 2
+
+    if debuff_id <= 0 
+      set debuff_id to 5
+
+      if Player->GetSpellEffects "MCPlayer" == 1
+        Player->RemoveSpell "MCPlayer"
+      endif
+      Player->AddSpell "MCPlayer"
+    else
+      set debuff_id to debuff_id - 1
+    endif
+  else
+    set debuff_timer to debuff_timer - GetSecondsPassed
+  endif
+	
+  if debuff_id == 5
+    if Player->GetSpellEffects "MCBlessing" == 0
+      Player->AddSpell "MCBlessing"
+    endif 
+  elseif Player->GetSpellEffects "MCBlessing" == 1
+    Player->RemoveSpell "MCBlessing"
+  endif
+
+  if debuff_id == 4 
+    if Player->GetSpellEffects "MCPoisonCurse" == 0
+      Player->AddSpell "MCPoisonCurse"
+    endif 
+  elseif Player->GetSpellEffects "MCPoisonCurse" == 1
+    Player->RemoveSpell "MCPoisonCurse"
+  endif
+
+  if debuff_id == 3
+    if Player->GetSpellEffects "MCMagickaCurse" == 0
+      Player->AddSpell "MCMagickaCurse"
+    endif 
+  elseif Player->GetSpellEffects "MCMagickaCurse" == 1
+    Player->RemoveSpell "MCMagickaCurse"
+  endif
+
+  if debuff_id == 2
+    if Player->GetSpellEffects "MCShockCurse" == 0
+      Player->AddSpell "MCShockCurse"
+    endif 
+  elseif Player->GetSpellEffects "MCShockCurse" == 1
+    Player->RemoveSpell "MCShockCurse"
+  endif
+
+  if debuff_id == 1
+    if Player->GetSpellEffects "MCFrostCurse" == 0
+      Player->AddSpell "MCFrostCurse"
+    endif 
+  elseif Player->GetSpellEffects "MCFrostCurse" == 1
+    Player->RemoveSpell "MCFrostCurse"
+  endif
+
+  if debuff_id == 0
+    if Player->GetSpellEffects "MCFireCurse" == 0
+      Player->AddSpell "MCFireCurse"
+    endif 
+  elseif Player->GetSpellEffects "MCFireCurse" == 1
+    Player->RemoveSpell "MCFireCurse"
+  endif
+
+End ModernCombat

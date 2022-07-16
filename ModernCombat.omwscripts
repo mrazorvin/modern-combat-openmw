@@ -1,0 +1,3 @@
+PLAYER: scripts/ModernCombat/player.lua
+GLOBAL: scripts/ModernCombat/global.lua
+CUSTOM: scripts/ModernCombat/npc.lua

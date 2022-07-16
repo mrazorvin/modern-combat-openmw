@@ -1,3 +1,0 @@
-PLAYER: scripts/GameplaySettings/player.lua
-GLOBAL: scripts/GameplaySettings/global.lua
-CUSTOM, NPC, CREATURE: scripts/GameplaySettings/npc.lua

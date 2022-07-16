@@ -1,0 +1,6 @@
+Begin ModernCombatStart
+	
+	Player->StartScript ModernCombat
+	StopScript ModernCombatStart	
+
+End ModernCombatStart
