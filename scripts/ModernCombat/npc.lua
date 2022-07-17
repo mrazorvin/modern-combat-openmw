@@ -24,6 +24,7 @@ local os_spear = 0
 local os_axe = 0
 local os_bluntweapon = 0
 local os_marksman = 0
+local os_handtohand = 0
 
 local os_athletics = 0
 
@@ -72,6 +73,7 @@ function on_update(is_inactive)
     local s_axe = skills.axe(self)
     local s_bluntweapon = skills.bluntweapon(self)
     local s_marksman = skills.marksman(self)
+    local s_handtohand = skills.handtohand(self)
 
     local s_athletics = skills.athletics(self)
 
@@ -103,6 +105,7 @@ function on_update(is_inactive)
         os_axe = s_axe.base
         os_bluntweapon = s_bluntweapon.base
         os_marksman = s_marksman.base
+        os_handtohand = s_handtohand.base
 
         os_athletics = s_athletics.base
 
@@ -135,6 +138,7 @@ function on_update(is_inactive)
         s_axe.base = os_axe
         s_bluntweapon.base = os_bluntweapon
         s_marksman.base = os_marksman
+        s_handtohand = os_handtohand
 
         s_athletics.base = os_athletics
 
@@ -169,11 +173,11 @@ function on_update(is_inactive)
     prev_magicka = d_magicka.current
 
     -- @fatigue
-    local is_low_fatigue = d_fatigue.current / d_fatigue.base < 0.05
+    local is_low_fatigue = d_fatigue.current / d_fatigue.base < 0.1
     if is_low_fatigue then
         low_fatigue_timer = low_fatigue_timer + 1
     end
-    if is_low_fatigue == 8 then
+    if low_fatigue_timer >= 6 then
         low_fatigue_timer = 0
         d_fatigue.current = d_fatigue.base
     end
@@ -200,19 +204,27 @@ function on_update(is_inactive)
         a_speed.base = 50
     end
 
-    s_conjuration.base = os_conjuration + 100
-    s_alteration.base = os_alteration + 100
-    s_illusion.base = os_illusion + 100
-    s_mysticism.base = os_mysticism + 100
-    s_restoration.base = os_restoration + 100
-    s_destruction.base = (os_destruction + 100) * mod_destruction
+    mod_skill(s_conjuration, os_conjuration, 1)
+    mod_skill(s_alteration, os_alteration, 1)
+    mod_skill(s_illusion, os_illusion, 1)
+    mod_skill(s_mysticism, os_mysticism, 1)
+    mod_skill(s_restoration, os_restoration, 1)
+    mod_skill(s_destruction, os_destruction, mod_destruction)
+    mod_skill(s_longblade, os_longblade, 1)
+    mod_skill(s_shortblade, os_shortblade, 1)
+    mod_skill(s_spear, os_spear, 1)
+    mod_skill(s_axe, os_axe, 1)
+    mod_skill(s_bluntweapon, os_bluntweapon, 1)
+    mod_skill(s_marksman, os_marksman, 1)
+    mod_skill(s_handtohand, os_handtohand, 1)
+end
 
-    s_longblade.base = os_longblade + 100
-    s_shortblade.base = os_shortblade + 100
-    s_spear.base = os_spear + 100
-    s_axe.base = os_axe + 100
-    s_bluntweapon.base = os_bluntweapon + 100
-    s_marksman.base = os_marksman + 100
+function mod_skill(skill, skill_origin, skill_mod)
+    local damage_mod = (100 - (skill.damage or 0)) / 100
+    if damage_mod < 0.2 then
+        damage_mod = 0.2
+    end
+    skill.base = (skill_origin + 100) * skill_mod * damage_mod
 end
 
 local last_update_time = core.getRealTime()

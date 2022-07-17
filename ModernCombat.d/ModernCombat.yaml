@@ -41,15 +41,6 @@ records:
   "GameSetting::fFatigueMult":
     type: GameSetting
     float: 0.0
-  "GameSetting::fFatigueReturnBase":
-    type: GameSetting
-    float: 1.1
-  "GameSetting::fFatigueReturnMult":
-    type: GameSetting
-    float: 0.7
-  "GameSetting::fEndFatigueMult":
-    type: GameSetting
-    float: 1.0
   "GameSetting::fFatigueAttackBase":
     type: GameSetting
     float: 25.0
@@ -113,10 +104,16 @@ records:
       compiled: ""
   "Spell::MCPlayer":
     type: Spell
-    name: Nerevarine Fate
+    name: Destiny
     spell_type: Ability
     cost: 0
     effects:
+      - effect_type: WeaknessToNormalWeapons
+        range: SelfType
+        area: 0
+        duration: 0
+        min_magnitude: 100
+        max_magnitude: 100
       - effect_type: Feather
         range: SelfType
         area: 0
@@ -191,7 +188,7 @@ records:
         max_magnitude: 100
   "Spell::MCBlessing":
     type: Spell
-    name: Nerevarine Blessing
+    name: Elements Blessing
     spell_type: Curse
     cost: 0
     effects:

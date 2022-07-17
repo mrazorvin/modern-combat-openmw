@@ -41,6 +41,10 @@ local recovery_effectivity = 100
 -- Settings
 local MAX_TIME_IN_COMBAT = 5
 
+local fFatigueReturnBase = core.getGMST("fFatigueReturnBase")
+local fFatigueReturnMult = core.getGMST("fFatigueReturnMult")
+local fEndFatigueMult = core.getGMST("fEndFatigueMult")
+
 local function onUpdate()
     local is_mod_disabled = settings:get("Disabled")
     local is_mod_enabled = not is_mod_disabled
@@ -100,11 +104,21 @@ local function onUpdate()
     if is_mod_enabled and (is_attack or is_move or is_jump or in_air) and (in_combat and can_move) then
         local backward_fatigue_drain = 0
         if is_move_backward then
-            backward_fatigue_drain = 0.18
+            backward_fatigue_drain = fatigue.base * 0.15 * seconds_passed_since_update
         end
 
-        local fatigue_loss = ((1.1 + (0.7 * total_endurance)) * seconds_passed_since_update)
+        local base_loss = fFatigueReturnBase + fFatigueReturnMult
+        local endur_loss = total_endurance * fEndFatigueMult
+        local fatigue_loss = base_loss * seconds_passed_since_update
+
         fatigue.current = fatigue.current - fatigue_loss - backward_fatigue_drain
+    elseif is_mod_enabled then
+        local fatigue_regen = (1.1 + (0.7 * total_endurance))
+        local fatigue_regen_per_second = fatigue_regen * seconds_passed_since_update
+        local next_fatigue = fatigue.current + fatigue_regen_per_second
+        if next_fatigue < fatigue.base then
+            fatigue.current = fatigue.current + fatigue_regen_per_second
+        end
     end
 
     -- combat mode
