@@ -1,0 +1,37 @@
+uniform_float uPower {
+    default = 0.0;
+    min = 0.0;
+    max = 1.0;
+    step = 0.05;
+    static = false;
+    description = "Power of the health pulsation";
+}
+
+fragment pass {
+    omw_In vec2 omw_TexCoord;
+
+    #define STARTING_RADIUS 0.5
+    #define FADE_COLOR vec3(4.0, 0.0, 0.0)
+    #define PULSATION_PERIOD 2.0
+
+    void main()
+    {
+        vec4 scene = omw_GetLastShader(omw_TexCoord);
+        float pixelGray = dot(scene.xyz, vec3(0.2126, 0.5152, 0.0722));
+        vec3 pixelColor = mix(
+            vec3(pixelGray, pixelGray, pixelGray),
+            scene.xyz,
+            uPower
+        );
+	
+        omw_FragColor = vec4(pixelColor.xyz, scene.a);
+    }
+}
+
+technique {
+    passes = pass;
+    glsl_version = 330;
+    hdr = false;
+    flags = hidden;
+    dynamic = true;
+}

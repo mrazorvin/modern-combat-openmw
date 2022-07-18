@@ -4,11 +4,13 @@ local core = require('openmw.core')
 local storage = require('openmw.storage')
 local types = require('openmw.types')
 local ai = require('openmw.interfaces').AI
+local I = require('openmw.interfaces')
 
 -- @settings
 local MOD_NAME = "ModernCombat"
 local MOD_SETTINGS = MOD_NAME .. "Settings__"
 local settings = storage.globalSection(MOD_SETTINGS)
+local values = storage.globalSection(MOD_NAME)
 
 -- @permanent
 local os_conjuration = 0
@@ -41,6 +43,9 @@ local is_humanoid = not is_creature
 local low_fatigue_timer = 0
 local low_magicka_timer = 0
 local prev_magicka = 0
+local prev_health = 0
+
+local last_update_time = core.getRealTime()
 
 function on_update(is_inactive)
     local target = ai.getActiveTarget('Combat') or ai.getActiveTarget('Pursue')
@@ -53,8 +58,24 @@ function on_update(is_inactive)
     local skip_update = not is_actor_affected and (not is_in_combat or is_mod_disabled)
     if skip_update then
         return;
+    end
+
+    local d_health = types.NPC.stats.dynamic.health(self)
+    local current_health = d_health.current
+    local health_diff = prev_health - current_health
+    if health_diff > 0 then
+        current_health = current_health + health_diff * (1 - math.max(values:get("PlayerFatigue"), 0.25))
+        d_health.current = current_health
+    end
+    prev_health = current_health
+
+    local real_time = core.getRealTime()
+    local seconds_passed_since_update = real_time - last_update_time
+    if seconds_passed_since_update < 2 then
+        return;
     else
         is_actor_affected = true
+        last_update_time = real_time
     end
 
     local skills = types.NPC.stats.skills
@@ -227,7 +248,6 @@ function mod_skill(skill, skill_origin, skill_mod)
     skill.base = (skill_origin + 100) * skill_mod * damage_mod
 end
 
-local last_update_time = core.getRealTime()
 return {
     engineHandlers = {
         onInactive = function()
@@ -238,13 +258,7 @@ return {
             on_update(false)
         end,
         onUpdate = function()
-            local real_time = core.getRealTime()
-            local seconds_passed_since_update = real_time - last_update_time
-
-            if seconds_passed_since_update > 2 then
-                on_update(false)
-                last_update_time = real_time
-            end
+            on_update(false)
         end,
         onSave = function()
             return {

@@ -21,6 +21,8 @@ I.Settings.registerGroup {
     }}
 }
 
+local values = storage.globalSection(MOD_NAME)
+
 local function onActorActive(actor)
     if actor and (actor.type == types.NPC or actor.type == types.Creature) then
         actor:addScript("scripts/ModernCombat/npc.lua")
@@ -32,6 +34,10 @@ return {
         ActorInactive = function(data)
             local actor = unpack(data)
             actor:removeScript("scripts/ModernCombat/npc.lua")
+        end,
+        PlayerStats = function(data)
+            local stats = unpack(data)
+            values:set("PlayerFatigue", stats.fatigue)
         end
     },
     engineHandlers = {

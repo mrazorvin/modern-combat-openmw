@@ -29,8 +29,8 @@ local strength_adjusted = 0
 
 local last_attack_commited_time = 0
 local last_attack_time = 0
-local last_knockdown_time = 0
 local last_dodge_time = 0
+local stamina_reservation_time = 0
 
 local dodge_turn_direction = 0
 local last_update_time = 0
@@ -39,11 +39,14 @@ local health_from_previous_frame = 0
 local recovery_effectivity = 100
 
 -- Settings
-local MAX_TIME_IN_COMBAT = 5
+local MAX_TIME_IN_COMBAT = 3
 
 local fFatigueReturnBase = core.getGMST("fFatigueReturnBase")
 local fFatigueReturnMult = core.getGMST("fFatigueReturnMult")
 local fEndFatigueMult = core.getGMST("fEndFatigueMult")
+
+local reserverd_stamina = 0
+local reserverd_stamina_recovery = 0
 
 local function onUpdate()
     local is_mod_disabled = settings:get("Disabled")
@@ -51,6 +54,8 @@ local function onUpdate()
 
     local fatigue = Player.stats.dynamic.fatigue(self)
     local health = Player.stats.dynamic.health(self)
+    local magicka = Player.stats.dynamic.magicka(self)
+
     local level = Player.stats.level(self)
 
     local strength = Player.stats.attributes.strength(self)
@@ -97,6 +102,13 @@ local function onUpdate()
         seconds_passed_since_update = real_time - last_update_time
     end
 
+    -- combat mode
+    if is_attack then
+        last_attack_time = real_time
+    elseif real_time - last_attack_time > MAX_TIME_IN_COMBAT then
+        last_attack_time = 0
+    end
+
     -- STAMINA & FATIGUE
     -- =================
     -- * Stops fatigue regeneration while running or jumping 
@@ -116,16 +128,9 @@ local function onUpdate()
         local fatigue_regen = (1.1 + (0.7 * total_endurance))
         local fatigue_regen_per_second = fatigue_regen * seconds_passed_since_update
         local next_fatigue = fatigue.current + fatigue_regen_per_second
-        if next_fatigue < fatigue.base then
-            fatigue.current = fatigue.current + fatigue_regen_per_second
+        if next_fatigue < (fatigue.base - reserverd_stamina) then
+            fatigue.current = next_fatigue
         end
-    end
-
-    -- combat mode
-    if is_attack then
-        last_attack_time = real_time
-    elseif real_time - last_attack_time > MAX_TIME_IN_COMBAT then
-        last_attack_time = 0
     end
 
     -- DODGE
@@ -302,18 +307,39 @@ local function onUpdate()
         last_attack_time = real_time
     end
 
-    -- KNOKDOWN
-    -- ========
-    -- * Knockdown on low fatigue
-    -- 
-    -- !!!! Keep this part as low as possible
-    -- 
-    if is_mod_enabled and fatigue.current <= 0 and last_knockdown_time == 0 then
-        fatigue.current = -50
-        last_knockdown_time = real_time
-    elseif last_knockdown_time ~= 0 and real_time - last_knockdown_time > 3 then
-        last_knockdown_time = 0
+    local spell_stance = Player.stance(self) == types.Actor.STANCE.Spell
+    local current_magicka = magicka.current;
+    local base_magicka = magicka.base;
+    local convesion_step = math.min(5 * seconds_passed_since_update, 5)
+    if spell_stance and current_magicka / base_magicka < 0.35 and reserverd_stamina / fatigue.base < 0.8 then
+        stamina_reservation_time = real_time
+        reserverd_stamina = reserverd_stamina + convesion_step
+        magicka.current = magicka.current + convesion_step
+        local reduced_stamina = fatigue.base - reserverd_stamina
+        if fatigue.current > reduced_stamina then
+            fatigue.current = reduced_stamina
+        end
     end
+
+    if real_time - stamina_reservation_time > 5 and reserverd_stamina ~= 0 then
+        reserverd_stamina_recovery = reserverd_stamina
+        reserverd_stamina = reserverd_stamina - convesion_step
+        if reserverd_stamina <= 0 then
+            reserverd_stamina = 0
+            reserverd_stamina_recovery = 0
+        end
+    elseif reserverd_stamina_recovery ~= 0 then
+        reserverd_stamina_recovery = reserverd_stamina_recovery - convesion_step
+        if reserverd_stamina_recovery > 0 then
+            reserverd_stamina = reserverd_stamina - convesion_step
+        else
+            reserverd_stamina_recovery = 0
+        end
+    end
+
+    core.sendGlobalEvent('PlayerStats', {{
+        fatigue = fatigue.current / fatigue.base
+    }})
 
     last_update_time = real_time
 end
