@@ -18,6 +18,16 @@ I.Settings.registerGroup {
         name = "Disabled",
         default = false,
         renderer = "checkbox"
+    }, {
+        key = "Dodge",
+        name = "Side dodge",
+        default = false,
+        renderer = "checkbox"
+    }, {
+        key = "Backward",
+        name = "Backward drain",
+        default = true,
+        renderer = "checkbox"
     }}
 }
 

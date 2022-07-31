@@ -8,45 +8,46 @@ local I = require('openmw.interfaces')
 local Player = types.Player
 local WepType = types.Weapon.TYPE
 
+-- @globals
 local MOD_NAME = "ModernCombat"
 local MOD_SETTINGS = MOD_NAME .. "Settings__"
 
+local settings = storage.globalSection(MOD_SETTINGS)
+local global_values = storage.globalSection(MOD_NAME)
+
+-- @interface
 I.Settings.registerPage {
     key = MOD_NAME,
     l10n = MOD_NAME,
     name = "Modern combat"
 }
 
-local settings = storage.globalSection(MOD_SETTINGS)
-
+-- @permanent:speed
 local attack_commited_speed_adjusted = 0
 local dodge_speed_adjusted = 0
 local speed_adjusted = 0
-
+-- @permanent:skills
 local athletics_adjusted = 0
 local health_adjusted = 0
 local strength_adjusted = 0
-
-local last_attack_commited_time = 0
+-- @temporary:time
+local last_update_time = 0
 local last_attack_time = 0
 local last_dodge_time = 0
+local last_attack_commited_time = 0
 local stamina_reservation_time = 0
-
-local dodge_turn_direction = 0
-local last_update_time = 0
-
-local health_from_previous_frame = 0
-local recovery_effectivity = 100
-
--- Settings
-local MAX_TIME_IN_COMBAT = 3
-
+-- @temporary:gmst
 local fFatigueReturnBase = core.getGMST("fFatigueReturnBase")
 local fFatigueReturnMult = core.getGMST("fFatigueReturnMult")
 local fEndFatigueMult = core.getGMST("fEndFatigueMult")
-
+-- @temporary:mechanics
+local dodge_turn_direction = 0
 local reserverd_stamina = 0
 local reserverd_stamina_recovery = 0
+local health_from_previous_frame = 0
+local melee_protection_effectivity = 100
+-- @temporary:const
+local max_time_in_combat = 3
 
 local function onUpdate()
     local is_mod_disabled = settings:get("Disabled")
@@ -105,7 +106,7 @@ local function onUpdate()
     -- combat mode
     if is_attack then
         last_attack_time = real_time
-    elseif real_time - last_attack_time > MAX_TIME_IN_COMBAT then
+    elseif real_time - last_attack_time > max_time_in_combat then
         last_attack_time = 0
     end
 
@@ -115,7 +116,7 @@ local function onUpdate()
     -- * Increase fatigue drain durin backward movement 
     if is_mod_enabled and (is_attack or is_move or is_jump or in_air) and (in_combat and can_move) then
         local backward_fatigue_drain = 0
-        if is_move_backward then
+        if is_move_backward and settings:get("Backward") then
             backward_fatigue_drain = fatigue.base * 0.15 * seconds_passed_since_update
         end
 
@@ -136,7 +137,8 @@ local function onUpdate()
     -- DODGE
     -- =====
     local can_dodge = dodge_speed_adjusted == 0
-    if (is_move_backward or is_move_side) and (is_mod_enabled and is_jump and can_move and can_dodge) then
+    if (is_move_backward or (is_move_side and settings:get("Dodge"))) and
+        (is_mod_enabled and is_jump and can_move and can_dodge) then
         dodge_speed_adjusted = 0
 
         if is_move_side then
@@ -180,7 +182,7 @@ local function onUpdate()
     -- ==========
     -- * Increase run speed for early levels
     -- * Increase walk speed for early levels
-    if is_move and is_mod_enabled then
+    if (is_move or is_move_side) and is_mod_enabled then
         if speed_adjusted == 0 and base_speed < 50 then
             speed_adjusted = 50 - base_speed
             speed.base = speed.base + speed_adjusted
@@ -283,20 +285,21 @@ local function onUpdate()
 
     local remain_health = (health.current / health.base);
     if remain_health >= 0.5 then
-        recovery_effectivity = math.min(100, recovery_effectivity + seconds_passed_since_update * 2)
+        melee_protection_effectivity = math.min(100, melee_protection_effectivity + seconds_passed_since_update * 2)
     else
-        recovery_effectivity = math.max(0, recovery_effectivity - seconds_passed_since_update * 2)
+        melee_protection_effectivity = math.max(0, melee_protection_effectivity - seconds_passed_since_update * 2)
     end
 
     if is_mod_enabled and remain_health <= 0.45 and not in_combat then
         health.current = health.current + health.base * 0.05 * seconds_passed_since_update
     end
 
-    local can_recovery = health_from_previous_frame ~= 0 and melee_weapon and (remain_health <= 0.5)
+    local can_recovery =
+        health_from_previous_frame ~= 0 and melee_weapon and (remain_health <= 0.5) and health.current > 0
     local health_diff = health_from_previous_frame - health.current
     if is_mod_enabled and can_recovery and health_diff > 0 then
         local recovery_amount = math.min(math.max(1 - (remain_health / 0.5), 0.2), 0.8) *
-                                    math.max((recovery_effectivity / 100), 0.5)
+                                    math.max((melee_protection_effectivity / 100), 0.5)
 
         health.current = (health.current + health_diff) - (health_diff * (1 - recovery_amount))
     end
@@ -328,7 +331,7 @@ local function onUpdate()
             reserverd_stamina = 0
             reserverd_stamina_recovery = 0
         end
-    elseif reserverd_stamina_recovery ~= 0 then
+    elseif reserverd_stamina_recovery ~= 0 and not in_combat then
         reserverd_stamina_recovery = reserverd_stamina_recovery - convesion_step
         if reserverd_stamina_recovery > 0 then
             reserverd_stamina = reserverd_stamina - convesion_step
