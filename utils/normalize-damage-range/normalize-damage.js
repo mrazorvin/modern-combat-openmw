@@ -24,11 +24,12 @@ try {
       }
       const bestDamageType = map[Math.max(...Object.keys(map).map(Number))];
       for (const damageType of damageTypes) {
-        record[damageType] = record[bestDamageType];
+        record[damageType] = [...record[bestDamageType]];
       }
       record.reach = record.reach / 2;
     }
   }
+  fs.writeFileSync(args.module, yaml.dump(doc), 'utf8');
 } catch (e) {
   console.log(e);
 }
