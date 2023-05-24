@@ -1,4 +1,6 @@
 Animations
 meshes
+utils/delta-plugin
+node_modules
 __pycache__
 *.zip
